@@ -1,0 +1,36 @@
+schema = 3
+
+[mod]
+  [mod."github.com/emersion/go-imap"]
+    version = "v1.2.1"
+    hash = "sha256-iLeG6+JRk1T0LKZZ4PZ/BurUkY66ggPCAzwx5rb2Yio="
+  [mod."github.com/emersion/go-message"]
+    version = "v0.15.0"
+    hash = "sha256-BUr+rnRFoYitiG8rpcHWWBoyaPYYK4ZbWsg08yn9n0A="
+  [mod."github.com/emersion/go-sasl"]
+    version = "v0.0.0-20200509203442-7bfe0ed36a21"
+    hash = "sha256-EAeSHTKDYNg223TdH+SM4Hz+N5R2HxHDyInxyObWUHk="
+  [mod."github.com/emersion/go-textwrapper"]
+    version = "v0.0.0-20200911093747-65d896831594"
+    hash = "sha256-uOK4pmRNE3VGy7pgaIxpqT86n6K9bG1yDvUZuf9pCdI="
+  [mod."github.com/go-telegram-bot-api/telegram-bot-api/v5"]
+    version = "v5.5.1"
+    hash = "sha256-ycDLUgjYSBBADOT9HEBkkD/f6mPW8/hHdiQcOt/IaqE="
+  [mod."github.com/jinzhu/inflection"]
+    version = "v1.0.0"
+    hash = "sha256-3h3pHib5MaCXKyKLIMyQnSptDJ16kPjCOQPoEBoQsZg="
+  [mod."github.com/jinzhu/now"]
+    version = "v1.1.5"
+    hash = "sha256-NNLqoFx9FczBBDpD0O0aSHnC/YDZ9E/xQ340o7u63IM="
+  [mod."github.com/mattn/go-sqlite3"]
+    version = "v1.14.15"
+    hash = "sha256-fSrs2sdBKFTAiffBHNnAkN8kDTqiXgm4HNqzJAOF1RM="
+  [mod."golang.org/x/text"]
+    version = "v0.3.7"
+    hash = "sha256-XH2pUzzQx95O0rak00grQvfACfL+EmZiV7ZzJBkX+XY="
+  [mod."gorm.io/driver/sqlite"]
+    version = "v1.4.4"
+    hash = "sha256-JhLh3nTqV3Cx3AmsFX9/jVhJPsySFmiDpcfNeOLZhHY="
+  [mod."gorm.io/gorm"]
+    version = "v1.24.3"
+    hash = "sha256-k1KGqOaR0jyZUli3/sv4jzzT7n5A+7zuTK1bundis7k="
