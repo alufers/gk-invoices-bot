@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -32,18 +31,6 @@ func loadConfig() error {
 	}
 	configFile, err := os.Open(filePath)
 	if err != nil {
-		defaultConfig := Config{
-			TelegramToken:      os.Getenv("GK_INVOICES_BOT_TOKEN"),
-			StorageDir:         os.Getenv("GK_INVOICES_STORAGE_DIR"),
-			NagInterval:        "15m0s",
-			EmailCheckInterval: "10m0s",
-		}
-		defaultConfigFile, _ := os.Create(filePath)
-		enc := json.NewEncoder(defaultConfigFile)
-		enc.SetIndent("", "  ")
-		enc.Encode(defaultConfig)
-		defaultConfigFile.Close()
-		log.Printf("created default config file %v", filePath)
 		return err
 	}
 	defer configFile.Close()
