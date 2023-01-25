@@ -19,6 +19,11 @@ func (m MonthToNotify) String() string {
 }
 
 func doSendNotifications() {
+	now := time.Now()
+	if config.NotificationsStartTime.IsTimeBefore(now) || config.NotificationsEndTime.IsTimeAfter(now) {
+		log.Printf("not sending notifications because it's not the right time")
+		return
+	}
 	notifiedChats := []NotifiedChat{}
 	if err := db.Find(&notifiedChats).Error; err != nil {
 		log.Printf("error getting notified chats: %v", err)
