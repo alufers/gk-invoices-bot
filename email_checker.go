@@ -92,25 +92,31 @@ CC, To: <b>`, attachment.FileName, attachment.SenderEmail, zipFile.Year, zipFile
 	return nil
 }
 
-// trashy golang function to fetch all eail attachments
-func doCheckEmail() error {
+type EmailCheckStats struct {
+	EmailsChecked int
+	Attachments   int
+}
+
+// trashy golang function to fetch all email attachments
+func doCheckEmail() (*EmailCheckStats, error) {
 	emailCheckMutex.Lock()
 	defer emailCheckMutex.Unlock()
+	stats := &EmailCheckStats{}
 	log.Printf("Checking email...")
 	conn, err := setupEmailConn()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer conn.Logout()
 	log.Printf("Connected to email server")
 
 	mbox, err := conn.Select("INBOX", false)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("error selecting INBOX: %v", err)
 	}
 	log.Printf("Found %d messages", mbox.Messages)
 	if mbox.Messages == 0 {
-		return nil
+		return stats, nil
 	}
 	// fetch the new messages
 	seqset := new(imap.SeqSet)
@@ -128,12 +134,13 @@ func doCheckEmail() error {
 	select {
 	case err := <-done:
 		if err != nil {
-			return err
+			return nil, err
 		}
 	case <-time.After(10 * time.Second):
-		return errors.New("Timeout")
+		return nil, errors.New("Timeout")
 	}
 	for msg := range messages {
+		stats.EmailsChecked++
 		log.Printf("Message: %v", msg.Envelope.Subject)
 		// fetch it's attachments
 		for _, p := range msg.Body {
@@ -142,15 +149,19 @@ func doCheckEmail() error {
 			}
 			entity, err := message.Read(p)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			multiPartReader := entity.MultipartReader()
 
+			if multiPartReader == nil {
+				continue
+			}
+
 			for e, err := multiPartReader.NextPart(); err != io.EOF; e, err = multiPartReader.NextPart() {
 				kind, params, cErr := e.Header.ContentType()
 				if cErr != nil {
-					return cErr
+					return nil, cErr
 				}
 				log.Printf("Part: %v, %v", kind, params)
 				if kind == "multipart/alternative" {
@@ -172,12 +183,13 @@ func doCheckEmail() error {
 				}
 				attachmentToProcess.Content, err = io.ReadAll(e.Body)
 				if err != nil {
-					return err
+					return nil, err
 				}
 				err = handleEmailAttachment(*attachmentToProcess)
 				if err != nil {
-					return err
+					return nil, err
 				}
+				stats.Attachments++
 
 			}
 
@@ -188,16 +200,16 @@ func doCheckEmail() error {
 
 		flags := []any{imap.DeletedFlag}
 		if err := conn.Store(seqset, imap.FormatFlagsOp(imap.AddFlags, true), flags, nil); err != nil {
-			return fmt.Errorf("error deleting message: %v", err)
+			return nil, fmt.Errorf("error deleting message: %v", err)
 		}
 		// expunge the mailbox
 		if err := conn.Expunge(nil); err != nil {
-			return fmt.Errorf("error expunging mailbox: %v", err)
+			return nil, fmt.Errorf("error expunging mailbox: %v", err)
 		}
 
 	}
 	log.Printf("Done checking email")
-	return nil
+	return stats, nil
 
 }
 
@@ -226,7 +238,7 @@ func runEmailCheckerLoop() {
 	}()
 	sleepDuration, _ := time.ParseDuration(config.EmailCheckInterval)
 	for {
-		err := doCheckEmail()
+		_, err := doCheckEmail()
 		if err != nil {
 			log.Printf("Error checking email: %v", err)
 		}

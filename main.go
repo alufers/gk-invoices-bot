@@ -247,14 +247,14 @@ func HandleMessage(update tgbotapi.Update) {
 		msg := tgbotapi.NewMessage(chatID, "Checking email...")
 		msg.ReplyToMessageID = messageID
 		progressMsg, err := bot.Send(msg)
-		err = doCheckEmail()
+		stats, err := doCheckEmail()
 		// delete progressMsg
 		bot.Send(tgbotapi.NewDeleteMessage(chatID, progressMsg.MessageID))
 		if err != nil {
 			sendError(chatID, err)
 			return
 		}
-		msg = tgbotapi.NewMessage(chatID, "Email checked.")
+		msg = tgbotapi.NewMessage(chatID, fmt.Sprintf("Checked %v emails, found %v attachments", stats.EmailsChecked, stats.Attachments))
 		msg.ReplyToMessageID = messageID
 		bot.Send(msg)
 	}
